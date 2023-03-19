@@ -2,14 +2,20 @@
 import React, {useState, useEffect} from "react"
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Round1 from './screens/Round1';
-import Round2 from './screens/Round2';
-import Round3 from './screens/Round3';
-import Result from './screens/Result';
-import Leaderboard from './screens/Leaderboard';
-import TestGame from './screens/TestGame';
-import Round4 from './screens/Round4';
-import Round5 from './screens/Round5';
+import Round1 from './extraScreens/Round1';
+import Round2 from './extraScreens/Round2';
+import Round3 from './extraScreens/Round3';
+import Result from './extraScreens/Result';
+import Leaderboard from './extraScreens/Leaderboard';
+import Round4 from './extraScreens/Round4';
+import Round5 from './extraScreens/Round5';
+import Game from "./screens/Game";
+import Home from "./screens/Home";
+import Game_2 from "./screens/Game_2";
+import Game_3 from "./screens/Game_3";
+import Game_4 from "./screens/Game_4";
+import Game_5 from "./screens/Game_5";
+import NormalResult from "./screens/NormalResult";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +25,19 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown : false}}>
+        <Stack.Screen name='Home' component={Home}/>
+
+
+        <Stack.Screen name='Game' component={Game}/>
+        <Stack.Screen name='Game_2' component={Game_2}/>
+        <Stack.Screen name='Game_3' component={Game_3}/>
+        <Stack.Screen name='Game_4' component={Game_4}/>
+        <Stack.Screen name='Game_5' component={Game_5}/>
+        <Stack.Screen name='NormalResult' component={NormalResult}/>
+
+
+
+
         <Stack.Screen name='Round1' component={Round1}/>
         <Stack.Screen name='Round2' component={Round2}/>
         <Stack.Screen name='Round3' component={Round3}/>

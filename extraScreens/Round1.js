@@ -5,8 +5,6 @@ import React, {useState, useEffect} from "react"
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-
-
 export default function Round1() {
   const navigation = useNavigation();
 
@@ -75,7 +73,6 @@ export default function Round1() {
   }, [timeLeft, isStart]);
 
 
-
   const clickButton = () => {
     setCount(count_1 + 1);
     setIsTouch(true)
@@ -90,7 +87,6 @@ export default function Round1() {
     // .then(() => console.log('AsyncStorage cleared!'))
     // .catch((error) => console.log(error));  
   }
-
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-black">
@@ -109,8 +105,7 @@ export default function Round1() {
         <View className="flex-row">
           {
             randomNumber === 1 ?
-            <TouchableOpacity className="rounded-full h-36 w-36 bg-white" onPress={clickButton}></TouchableOpacity>
-            :
+            <TouchableOpacity className="rounded-full h-36 w-36 bg-white" onPress={clickButton}></TouchableOpacity>            :
             <View className="rounded-full h-36 w-36 m-2 bg-black"/>
           }
           {
@@ -125,13 +120,13 @@ export default function Round1() {
         <View className="flex-row">
           {
             randomNumber === 3 ?
-            <TouchableOpacity className="rounded-full h-40 w-40 bg-white" onPress={clickButton}></TouchableOpacity>
+            <TouchableOpacity className="rounded-full h-36 w-36 bg-white" onPress={clickButton}></TouchableOpacity>
             :
             <View className="rounded-full h-40 w-40 m-2 bg-black"/>
           }
           {
             randomNumber === 4 ?
-            <TouchableOpacity className="rounded-full h-40 w-40 bg-white" onPress={clickButton}></TouchableOpacity>
+            <TouchableOpacity className="rounded-full h-36 w-36 bg-white" onPress={clickButton}></TouchableOpacity>
             :
             <View className="rounded-full h-40 w-40 m-2 bg-black"/>
           }

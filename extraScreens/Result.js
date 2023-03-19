@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import {useNavigation} from '@react-navigation/core'
 
 
-
 const Result = () => {
 
   const navigation = useNavigation();
@@ -17,6 +16,8 @@ const Result = () => {
   const [roundFive_score, setRoundFiveScore] = useState('');
 
   const [name, setName] = useState('');
+  const [showNameInput, setShowNameInput] = useState(false);
+
   // const [data, setData] = useState([]);
 
   const total_score = parseInt(roundOne_score) + parseInt(roundTwo_score) + parseInt(roundThree_score) + parseInt(roundFour_score) + parseInt(roundFive_score)
@@ -83,6 +84,16 @@ const Result = () => {
 
   const key = `@MySuperStore:${name}`; // Create a unique key for the user
 
+  const removeScoreRecord = async() => {
+    await AsyncStorage.multiRemove(['roundOne_score', 'roundTwo_score', 'roundThree_score', 'roundFour_score', 'roundFive_score'])
+      .then(() => {
+        console.log(`Keys removed successfully!`);
+      })
+      .catch((error) => {
+        console.log(`Error removing keys:`, error);
+      });
+  }
+
   const handleSave = async() => {
     if (name.trim() === ''){
       Alert.alert('Error', 'Please Enter Your Name.')
@@ -91,20 +102,20 @@ const Result = () => {
     
     await AsyncStorage.setItem(key, JSON.stringify(userData))
     .then(() => {
-      console.log(`Data for ${name} saved successfully!`);
-      navigation.replace('Leaderboard')
+      Alert.alert('Success', `Data for ${name} saved successfully!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.replace('Leaderboard');
+          },
+        },
+      ]);
     })
     .catch((error) => {
       console.log(`Error saving data for ${name}:`, error);
     });
 
-    await AsyncStorage.multiRemove(['roundOne_score', 'roundTwo_score', 'roundThree_score', 'roundFour_score', 'roundFive_score'])
-      .then(() => {
-        console.log(`Keys removed successfully!`);
-      })
-      .catch((error) => {
-        console.log(`Error removing keys:`, error);
-      });
+    removeScoreRecord();
     
     await AsyncStorage.getAllKeys()
       .then((keys) => {
@@ -115,6 +126,33 @@ const Result = () => {
       });
   }
 
+  const checkTop25 = async () => {
+    try {
+      const allKeys = await AsyncStorage.getAllKeys();
+      const data = await AsyncStorage.multiGet(allKeys);
+      const parsedData = data.map(([key, value]) => ({
+        name: JSON.parse(value).name,
+        total_score: JSON.parse(value).total_score,
+      }));
+  
+      const sortedData = parsedData.sort((a, b) => b.total_score - a.total_score);
+      const top25 = sortedData.slice(0, 25);
+  
+      if (total_score > top25[24]?.total_score || top25.length < 25) {
+        Alert.alert('Congratulations!', 'You are in the top 25. Please enter your name.');
+        setShowNameInput(true);
+      } else {
+        Alert.alert('Sorry!', 'Your score is not in the top 25.');
+        setShowNameInput(false);
+      }
+    } catch (error) {
+      console.log('Error checking top 25:', error);
+    }
+  };
+
+  useEffect(() => {
+    checkTop25();
+  }, []);
 
   // useEffect(() => {
   //   const getData = async () => {
@@ -130,11 +168,13 @@ const Result = () => {
   // }, []);
 
 
-  const handleBack = () => {
-    navigation.replace("Round1")
+  const handleBack = async() => {
+    removeScoreRecord();
+    navigation.replace("Home")
   }
 
-  const handleLeaderboard = () => {
+  const handleLeaderboard = async() => {
+    removeScoreRecord();
     navigation.replace("Leaderboard")
   }
 
@@ -142,12 +182,15 @@ const Result = () => {
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-black">
         <View className="items-center justify-center">
-        <TextInput 
+        {showNameInput && (
+          <TextInput
             className="rounded-lg bg-white/90 w-48 pb-3 pt-3 pl-3 mb-3"
-            placeholder='Name'
+            placeholder="Name"
             value={name}
             maxLength={15}
-            onChangeText={text => setName(text)}/>
+            onChangeText={(text) => setName(text)}
+          />
+        )}
             <Text className="text-white text-[30px]">Result</Text>
             <Text className="text-white text-[30px]">Round 1: {roundOne_score}</Text>
             <Text className="text-white text-[30px]">Round 2: {roundTwo_score}</Text>
@@ -163,14 +206,16 @@ const Result = () => {
                 <Text className="text-[16px]">Save Record</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleBack}>
-                <Text className="text-[16px]">Back</Text>
+          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleLeaderboard}>
+                <Text className="text-[16px]">Leaderboard</Text>
           </TouchableOpacity>
         </View>
 
         <View className="flex-row items-center justify-center h-10 gap-8">
-          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleLeaderboard}>
-                <Text className="text-[16px]">Leaderboard</Text>
+          
+
+          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleBack}>
+                <Text className="text-[16px]">Back</Text>
           </TouchableOpacity>
         </View>
 

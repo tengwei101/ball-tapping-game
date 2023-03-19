@@ -41,10 +41,11 @@ const Leaderboard = () => {
     );
   };
 
+  // only show top 25 players
   const limitData = data.slice(0, 25);
 
   const handleBack = () => {
-    navigation.replace("Round1")
+    navigation.replace("Home")
   }
 
   const handleRefresh = () => {
