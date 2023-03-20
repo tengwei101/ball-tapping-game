@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/core'
@@ -44,12 +44,29 @@ const Leaderboard = () => {
   // only show top 25 players
   const limitData = data.slice(0, 25);
 
-  const handleBack = () => {
-    navigation.replace("Home")
-  }
 
-  const handleRefresh = () => {
-    setRefreshCount(refreshCount + 1);
+  const handleClear = () => {
+    Alert.alert('Clear Records', 'Do you want to clear all of the records?', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          AsyncStorage.clear()
+          .then(() => {
+            console.log('AsyncStorage cleared!')
+            Alert.alert('Success', 'All the records has been cleared!')
+            setRefreshCount(refreshCount + 1);
+          })
+          .catch((error) => {
+            console.log(error)
+            Alert.alert('Error', error)
+          }); 
+        },
+      },
+      {
+        text: 'No',
+        style: 'cancel',
+      },
+    ]);
   }
 
   return (
@@ -77,12 +94,9 @@ const Leaderboard = () => {
         style={{ width: '100%' }}
       />
     <View className="flex-row items-center justify-center h-48 gap-8">
-    <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleBack}>
-        <Text className="text-[16px]">Back</Text>
-    </TouchableOpacity>
 
-    <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleRefresh}>
-        <Text className="text-[16px]">Refresh</Text>
+    <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleClear}>
+        <Text className="text-[16px]">Clear</Text>
     </TouchableOpacity>
     </View>
 

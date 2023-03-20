@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveScore, removeScore } from './Game';
+import { useFocusEffect } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/core'
+
 
 const getScore = async () => {
   try {
@@ -13,16 +17,36 @@ const getScore = async () => {
 };
 
 const NormalResult = () => {
+  const navigation = useNavigation();
+
+
   const [score, setScore] = useState(0);
 
-  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackButton = () => {
+        // Add your custom back button handling logic here
+        // Return 'true' if you want to prevent the default back button behavior
+        removeScore();
+        navigation.replace("Home");
+        return true;
+      };
+  
+    // Add the event listener when the component mounts
+    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
     const fetchScore = async () => {
       const totalScore = await getScore();
       setScore(totalScore);
     };
 
     fetchScore();
-  }, []);
+
+    return () => {
+      // Remove the event listener when the component unmounts
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+    };
+  }, []));
 
   return (
     <View style={styles.container}>

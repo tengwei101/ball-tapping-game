@@ -1,9 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Alert, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from "react"
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native';
+
 
 
 const Round3 = () => {
@@ -14,7 +16,19 @@ const Round3 = () => {
   const [timeLeft, setTimeLeft] = useState(5);
   const [isStart, setIsStart] = useState(false)
 
-  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackButton = () => {
+        // Add your custom back button handling logic here
+        // Return 'true' if you want to prevent the default back button behavior
+        removeScoreRecord();
+        navigation.replace("Home");
+        return true;
+      };
+  
+    // Add the event listener when the component mounts
+    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
     let timer;
     if (isStart && timeLeft > 0) {
       timer = setTimeout(() => {
@@ -50,6 +64,7 @@ const Round3 = () => {
             text: 'No',
             onPress: () => {
                 console.log('No pressed'),
+                removeScoreRecord();
                 navigation.replace("Round1")
             },
             style: 'cancel',
@@ -59,8 +74,15 @@ const Round3 = () => {
       );
       setIsStart(false);
     }
-    return () => clearTimeout(timer);
-  }, [timeLeft, isStart]);
+    // Clean up function
+    return () => {
+      // Remove the event listener when the component unmounts
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+      clearTimeout(timer);
+    };
+  }, [timeLeft, isStart]),
+);
+
 
 
 
@@ -73,6 +95,16 @@ const Round3 = () => {
     setTimeLeft(5);
     setIsStart(true);
     setCount(0)
+  }
+
+  const removeScoreRecord = async() => {
+    await AsyncStorage.multiRemove(['roundOne_score', 'roundTwo_score', 'roundThree_score', 'roundFour_score', 'roundFive_score'])
+      .then(() => {
+        console.log(`Keys removed successfully!`);
+      })
+      .catch((error) => {
+        console.log(`Error removing keys:`, error);
+      });
   }
 
 

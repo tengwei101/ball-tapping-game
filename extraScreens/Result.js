@@ -1,8 +1,10 @@
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, Alert, BackHandler } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {useNavigation} from '@react-navigation/core'
+import { useFocusEffect } from '@react-navigation/native';
+
 
 
 const Result = () => {
@@ -150,9 +152,26 @@ const Result = () => {
     }
   };
 
-  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackButton = () => {
+        // Add your custom back button handling logic here
+        // Return 'true' if you want to prevent the default back button behavior
+        removeScoreRecord();
+        navigation.replace("Home");
+        return true;
+      };
+  
+    // Add the event listener when the component mounts
+    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
     checkTop25();
-  }, []);
+    // Clean up function
+    return () => {
+      // Remove the event listener when the component unmounts
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+    };
+  }, []));
 
   // useEffect(() => {
   //   const getData = async () => {

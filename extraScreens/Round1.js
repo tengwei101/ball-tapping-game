@@ -1,9 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Alert, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState, useEffect} from "react"
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native';
+
 
 export default function Round1() {
   const navigation = useNavigation();
@@ -12,9 +14,21 @@ export default function Round1() {
   const [randomNumber, setRandomNumber] = useState(1);
   const [timeLeft, setTimeLeft] = useState(5);
   const [isStart, setIsStart] = useState(false)
-  const [isTouch, setIsTouch] = useState(false)
 
-  useEffect(() => {
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackButton = () => {
+        // Add your custom back button handling logic here
+        // Return 'true' if you want to prevent the default back button behavior
+        removeScoreRecord();
+        navigation.replace("Home");
+        return true;
+      };
+  
+    // Add the event listener when the component mounts
+    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
     let timer;
     if (isStart && timeLeft > 0) {
       timer = setTimeout(() => {
@@ -36,23 +50,6 @@ export default function Round1() {
                 .catch((error) => {
                   console.log('Error storing data:', error);
                 });
-              // AsyncStorage.getAllKeys()
-              //   .then((keys) => {
-              //     console.log('All keys retrieved successfully:', keys);
-              //   })
-              //   .catch((error) => {
-              //     console.log('Error retrieving keys:', error);
-              //   });
-              
-              //   AsyncStorage.multiGet(['roundOne_score'])
-              //   .then((results) => {
-              //     results.forEach((result) => {
-              //       console.log(`Key: ${result[0]}, Value: ${result[1]}`);
-              //     });
-              //   })
-              //   .catch((error) => {
-              //     console.log('Error retrieving data:', error);
-              //   });
             }
           },
           {
@@ -69,23 +66,35 @@ export default function Round1() {
       );
       setIsStart(false);
     }
-    return () => clearTimeout(timer);
-  }, [timeLeft, isStart]);
+        // Clean up function
+        return () => {
+          // Remove the event listener when the component unmounts
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+          clearTimeout(timer);
+        };
+      }, [timeLeft, isStart]),
+    );
 
 
   const clickButton = () => {
     setCount(count_1 + 1);
-    setIsTouch(true)
     setRandomNumber(Math.floor(Math.random() * 4) + 1);
+  }
+
+  const removeScoreRecord = async() => {
+    await AsyncStorage.multiRemove(['roundOne_score', 'roundTwo_score', 'roundThree_score', 'roundFour_score', 'roundFive_score'])
+      .then(() => {
+        console.log(`Keys removed successfully!`);
+      })
+      .catch((error) => {
+        console.log(`Error removing keys:`, error);
+      });
   }
 
   const handleStart = () => {
     setTimeLeft(5);
     setIsStart(true);
     setCount(0);
-    // AsyncStorage.clear()
-    // .then(() => console.log('AsyncStorage cleared!'))
-    // .catch((error) => console.log(error));  
   }
 
   return (

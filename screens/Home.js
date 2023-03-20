@@ -25,10 +25,12 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.logo}
-        source={require('../assets/gameHomelogo.gif')} // Replace this with the path to your game logo
-      />
+      <View style={styles.logoContainer}>
+        <Image
+          style={styles.logo}
+          source={require('../assets/gameHomelogo.gif')} // Replace this with the path to your game logo
+        />
+      </View>
       <TouchableOpacity style={styles.button} onPress={onNormalGamePress}>
         <Text style={styles.buttonText}>Normal Game</Text>
       </TouchableOpacity>
@@ -49,10 +51,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  logoContainer: {
+    width: 200,
+    height: 200,
+    marginBottom: 50,
+    borderRadius: 99999,
+    overflow: 'hidden',
+  },
   logo: {
     width: 200,
     height: 200,
     marginBottom: 50,
+
   },
   button: {
     backgroundColor: '#CAA7DD',
@@ -64,6 +74,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#000000',
     fontSize: 16,
+    fontWeight: '500',
   },
 });
 

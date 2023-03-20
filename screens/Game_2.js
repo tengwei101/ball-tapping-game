@@ -1,45 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, StyleSheet, Alert } from 'react-native';
+import { View, Button, Text, StyleSheet, Alert,BackHandler } from 'react-native';
 import Circle from '../components/Circle_2';
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const saveScore = async (score) => {
-  try {
-    const currentScore = await AsyncStorage.getItem('totalScore');
-    const newScore = currentScore ? parseInt(currentScore) + score : score;
-    await AsyncStorage.setItem('totalScore', newScore.toString());
-  } catch (error) {
-    console.log('Error saving score:', error);
-  }
-};
-
+import { saveScore, removeScore } from './Game';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Game_2 = () => {
   const navigation = useNavigation();
-
-
+  
   const [circles, setCircles] = useState(Array(9).fill(false));
   const [score, setScore] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [timer, setTimer] = useState(5);
+  const [clickedCircles, setClickedCircles] = useState(Array(9).fill(false));
+  const [isLevelCompleted, setIsLevelCompleted] = useState(false);
 
-  useEffect(() => {
-    if (gameStarted) {
-      const timerId = setInterval(() => setTimer((t) => t - 1), 1000);
-      if (timer === 0) {
-        showNextLevelAlert();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackButton = () => {
+        // Add your custom back button handling logic here
+        // Return 'true' if you want to prevent the default back button behavior
+        removeScore();
+        navigation.replace("Home");
+        return true;
+      };
+  
+      // Add the event listener when the component mounts
+      BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+  
+      if (gameStarted) {
+        const timerId = setInterval(() => setTimer((t) => t - 1), 1000);
+        if (timer === 0) {
+          setGameStarted(false);
+          showNextLevelAlert();
+        }
+        return () => {
+          clearInterval(timerId);
+          // Remove the event listener when the component unmounts
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+        };
       }
-      return () => clearInterval(timerId);
-    }
-  }, [gameStarted, timer]);
-
-  const resetGame = () => {
-    setGameStarted(false);
-    setCircles(Array(9).fill(false));
-    setScore(0);
-    setTimer(5);
-  };
+      return () => {
+        // Remove the event listener when the component unmounts
+        BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+      };
+    }, [gameStarted, timer, navigation])
+  );
+  
+  
 
   const showNextLevelAlert = () => {
     Alert.alert(
@@ -49,13 +59,16 @@ const Game_2 = () => {
         {
           text: 'No',
           onPress: () => {
-            navigation.replace("Game");
+            setIsLevelCompleted(false);
+            removeScore();
+            resetGame();
           },
           style: 'cancel',
         },
         {
           text: 'Yes',
           onPress: async () => {
+            setIsLevelCompleted(false);
             await saveScore(score);
             navigation.replace("Game_3");
           },
@@ -64,6 +77,7 @@ const Game_2 = () => {
       { cancelable: false }
     );
   };
+  
 
   const startGame = () => {
     setGameStarted(true);
@@ -89,18 +103,35 @@ const Game_2 = () => {
   
 
   const onCirclePress = (index) => {
+    if (clickedCircles[index]) {
+      return;
+    }
+
     const newCircles = [...circles];
     newCircles[index] = true;
     setCircles(newCircles);
-    setScore(score + 1);
+
+    const newClickedCircles = [...clickedCircles];
+    newClickedCircles[index] = true;
+    setClickedCircles(newClickedCircles);
+
+    setScore((prevScore) => prevScore + 1);
 
     if (newCircles.every((circle) => circle)) {
       setGameStarted(false);
-      showNextLevelAlert();
+      setIsLevelCompleted(true);
     } else {
       lightUpRandomCircle();
     }
+    
   };
+
+  useEffect(() => {
+    if (isLevelCompleted) {
+      showNextLevelAlert();
+    }
+  }, [isLevelCompleted]);
+  
 
   return (
     <View style={styles.container}>
@@ -109,6 +140,7 @@ const Game_2 = () => {
           <Circle
             key={index}
             isLit={circle}
+            isClicked={clickedCircles[index]}
             onPress={() => gameStarted && onCirclePress(index)}
           />
         ))}

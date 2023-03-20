@@ -35,9 +35,6 @@ export default function App() {
         <Stack.Screen name='Game_5' component={Game_5}/>
         <Stack.Screen name='NormalResult' component={NormalResult}/>
 
-
-
-
         <Stack.Screen name='Round1' component={Round1}/>
         <Stack.Screen name='Round2' component={Round2}/>
         <Stack.Screen name='Round3' component={Round3}/>

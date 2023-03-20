@@ -1,8 +1,9 @@
-import { StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Alert, BackHandler } from 'react-native';
 import React, {useState, useEffect} from 'react'
 import {useNavigation} from '@react-navigation/core'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const Round2 = () => {
@@ -13,53 +14,65 @@ const Round2 = () => {
     const [timeLeft, setTimeLeft] = useState(5);
     const [isStart, setIsStart] = useState(false)
 
-    useEffect(() => {
-      let timer;
-      if (isStart && timeLeft > 0) {
-        timer = setTimeout(() => {
-          setTimeLeft(timeLeft - 1);
-        }, 1000);
-      } else if (timeLeft === 0) {
-        Alert.alert(
-          'Time is up!',
-          'Do you want to continue to Round 3?',
-          [
-            {
-              text: 'Yes',
-              onPress: () => {
-                navigation.replace("Round3");
-                AsyncStorage.setItem('roundTwo_score', count_2.toString())
-                .then(() => {
-                  console.log('Data stored successfully!');
-                })
-                .catch((error) => {
-                  console.log('Error storing data:', error);
-                });
-
-                AsyncStorage.getAllKeys()
-                .then((keys) => {
-                  console.log('All keys retrieved successfully:', keys);
-                })
-                .catch((error) => {
-                  console.log('Error retrieving keys:', error);
-                });
-              }
-            },
-            {
-              text: 'No',
-              onPress: () => {
-                console.log('No pressed'),
-                navigation.replace("Round1")
+    useFocusEffect(
+      React.useCallback(() => {
+        const handleBackButton = () => {
+          // Add your custom back button handling logic here
+          // Return 'true' if you want to prevent the default back button behavior
+          removeScoreRecord();
+          navigation.replace("Home");
+          return true;
+        };
+    
+        // Add the event listener when the component mounts
+        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    
+        let timer;
+        if (isStart && timeLeft > 0) {
+          timer = setTimeout(() => {
+            setTimeLeft(timeLeft - 1);
+          }, 1000);
+        } else if (timeLeft === 0) {
+          Alert.alert(
+            'Time is up!',
+            'Do you want to continue to Round 3?',
+            [
+              {
+                text: 'Yes',
+                onPress: () => {
+                  navigation.replace("Round3");
+                  AsyncStorage.setItem('roundTwo_score', count_2.toString())
+                    .then(() => {
+                      console.log('Data stored successfully!');
+                    })
+                    .catch((error) => {
+                      console.log('Error storing data:', error);
+                    });
+                },
               },
-              style: 'cancel',
-            },
-          ],
-          { cancelable: false },
-        );
-        setIsStart(false);
-      }
-      return () => clearTimeout(timer);
-    }, [timeLeft, isStart]);
+              {
+                text: 'No',
+                onPress: () => {
+                  console.log('No pressed');
+                  navigation.replace('Round1');
+                },
+                style: 'cancel',
+              },
+            ],
+            { cancelable: false },
+          );
+          setIsStart(false);
+        }
+    
+        // Clean up function
+        return () => {
+          // Remove the event listener when the component unmounts
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+          clearTimeout(timer);
+        };
+      }, [timeLeft, isStart]),
+    );
+    
   
   
   
@@ -74,6 +87,15 @@ const Round2 = () => {
       setCount(0)
     }
   
+    const removeScoreRecord = async() => {
+      await AsyncStorage.multiRemove(['roundOne_score', 'roundTwo_score', 'roundThree_score', 'roundFour_score', 'roundFive_score'])
+        .then(() => {
+          console.log(`Keys removed successfully!`);
+        })
+        .catch((error) => {
+          console.log(`Error removing keys:`, error);
+        });
+    }
   
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-black">
