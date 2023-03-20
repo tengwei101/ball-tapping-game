@@ -24,50 +24,24 @@ const Result = () => {
 
   const total_score = parseInt(roundOne_score) + parseInt(roundTwo_score) + parseInt(roundThree_score) + parseInt(roundFour_score) + parseInt(roundFive_score)
 
-  AsyncStorage.getItem('roundOne_score')
-  .then((value) => {
-    setRoundOneScore(value)
-    console.log('Data retrieved successfully:', roundOne_score);
-  })
-  .catch((error) => {
-    console.log('Error retrieving data:', error);
-  });
-
-  AsyncStorage.getItem('roundTwo_score')
-    .then((value) => {
-      setRoundTwoScore(value)
-      console.log('Data retrieved successfully:', roundTwo_score);
-    })
-    .catch((error) => {
+  const fetchData = async () => {
+    try {
+      const roundOne = await AsyncStorage.getItem('roundOne_score');
+      const roundTwo = await AsyncStorage.getItem('roundTwo_score');
+      const roundThree = await AsyncStorage.getItem('roundThree_score');
+      const roundFour = await AsyncStorage.getItem('roundFour_score');
+      const roundFive = await AsyncStorage.getItem('roundFive_score');
+  
+      setRoundOneScore(roundOne);
+      setRoundTwoScore(roundTwo);
+      setRoundThreeScore(roundThree);
+      setRoundFourScore(roundFour);
+      setRoundFiveScore(roundFive);
+    } catch (error) {
       console.log('Error retrieving data:', error);
-    });
+    }
+  };
 
-  AsyncStorage.getItem('roundThree_score')
-    .then((value) => {
-      setRoundThreeScore(value)
-      console.log('Data retrieved successfully:', roundThree_score);
-    })
-    .catch((error) => {
-      console.log('Error retrieving data:', error);
-    });
-
-  AsyncStorage.getItem('roundFour_score')
-    .then((value) => {
-      setRoundFourScore(value)
-      console.log('Data retrieved successfully:', roundFour_score);
-    })
-    .catch((error) => {
-      console.log('Error retrieving data:', error);
-    });
-
-  AsyncStorage.getItem('roundFive_score')
-    .then((value) => {
-      setRoundFiveScore(value)
-      console.log('Data retrieved successfully:', roundFive_score);
-    })
-    .catch((error) => {
-      console.log('Error retrieving data:', error);
-    });
 
   AsyncStorage.multiGet(['roundOne_score', 'roundTwo_score', 'roundThree_score', 'roundFour_score', 'roundFive_score'])
     .then((value) => {
@@ -77,8 +51,7 @@ const Result = () => {
       console.log('Error retrieving data:', error);
     });
 
-    
-
+  
   const userData = { 
     name, 
     total_score,
@@ -140,7 +113,9 @@ const Result = () => {
       const sortedData = parsedData.sort((a, b) => b.total_score - a.total_score);
       const top25 = sortedData.slice(0, 25);
   
-      if (total_score > top25[24]?.total_score || top25.length < 25) {
+      const inTop25 = top25.some(record => total_score >= record.total_score);
+  
+      if (inTop25 || top25.length < 25) {
         Alert.alert('Congratulations!', 'You are in the top 25. Please enter your name.');
         setShowNameInput(true);
       } else {
@@ -151,6 +126,7 @@ const Result = () => {
       console.log('Error checking top 25:', error);
     }
   };
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -165,7 +141,6 @@ const Result = () => {
     // Add the event listener when the component mounts
     BackHandler.addEventListener('hardwareBackPress', handleBackButton);
 
-    checkTop25();
     // Clean up function
     return () => {
       // Remove the event listener when the component unmounts
@@ -173,24 +148,17 @@ const Result = () => {
     };
   }, []));
 
-  // useEffect(() => {
-  //   const getData = async () => {
-  //     try {
-  //       const allKeys = await AsyncStorage.getAllKeys();
-  //       const data = await AsyncStorage.multiGet(allKeys);
-  //       setData(data); // set state with the retrieved data
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   getData();
-  // }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-
-  const handleBack = async() => {
-    removeScoreRecord();
-    navigation.replace("Home")
-  }
+  useEffect(() => {
+    // This will execute fetchData when the component mounts, and it will execute checkTop25 whenever the total_score value changes.
+    if (total_score) {
+      checkTop25();
+    }
+  }, [total_score]);
+  
 
   const handleLeaderboard = async() => {
     removeScoreRecord();
@@ -221,20 +189,17 @@ const Result = () => {
         </View>
 
         <View className="flex-row items-center justify-center h-48 gap-8">
-          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleSave}>
+            {showNameInput && (
+              <TouchableOpacity
+                className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28"
+                onPress={handleSave}
+              >
                 <Text className="text-[16px]">Save Record</Text>
-          </TouchableOpacity>
+              </TouchableOpacity>
+            )}
 
           <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleLeaderboard}>
                 <Text className="text-[16px]">Leaderboard</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="flex-row items-center justify-center h-10 gap-8">
-          
-
-          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleBack}>
-                <Text className="text-[16px]">Back</Text>
           </TouchableOpacity>
         </View>
 

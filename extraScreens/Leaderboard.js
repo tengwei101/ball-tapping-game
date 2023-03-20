@@ -10,8 +10,57 @@ const Leaderboard = () => {
   const navigation = useNavigation();
   const [refreshCount, setRefreshCount] = useState(0);
 
+  const insertSampleData = async () => {
+    const names = [
+      "Alice",
+      "Bob",
+      "Carol",
+      "David",
+      "Eva",
+      "Frank",
+      "Grace",
+      "Hannah",
+      "Ivan",
+      "Jack",
+      "Karen",
+      "Leo",
+      "Mona",
+      "Nate",
+      "Olivia",
+      "Pete",
+      "Quincy",
+      "Rachel",
+      "Sam",
+      "Tina",
+      "Uma",
+      "Victor",
+      "Wendy",
+      "Xavier",
+      "Yasmin",
+      "Zoe",
+      "John",
+      "Jane",
+      "Jim",
+      "Jill",
+    ];
+  
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
+      const total_score = Math.floor(Math.random() * (56 - 35)) + 35; // Generate a random score between 35 and 55
+      const userData = {
+        name,
+        total_score,
+      };
+  
+      const key = `@MySuperStore:${name}`;
+      await AsyncStorage.setItem(key, JSON.stringify(userData));
+    }
+  };
 
     useEffect(() => {
+        // Comment the line below if you don't want to insert the sample data again
+        // insertSampleData();
+
         const getData = async () => {
         try {
             const allKeys = await AsyncStorage.getAllKeys();
