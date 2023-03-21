@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, Alert, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/core'
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const NormalLeaderboard = () => {
@@ -20,17 +21,36 @@ const NormalLeaderboard = () => {
       } 
       //comment the else statement if dont want to insert raw data
       //if no data then insert raw data
-      else {
-        await insertSampleData();
-        data = await AsyncStorage.getItem('normal_leaderboard');
-        const parsedData = JSON.parse(data);
-        const sortedData = parsedData.sort((a, b) => b.totalScore - a.totalScore);
-        setLeaderboardData(sortedData);
-      }
+      // else {
+      //   await insertSampleData();
+      //   data = await AsyncStorage.getItem('normal_leaderboard');
+      //   const parsedData = JSON.parse(data);
+      //   const sortedData = parsedData.sort((a, b) => b.totalScore - a.totalScore);
+      //   setLeaderboardData(sortedData);
+      // }
     } catch (error) {
       console.log('Error fetching leaderboard data:', error);
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const handleBackButton = () => {
+        // Add your custom back button handling logic here
+        // Return 'true' if you want to prevent the default back button behavior
+        navigation.navigate("Home");
+        return true;
+      };
+  
+        // Add the event listener when the component mounts
+        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+        // Clean up function
+        return () => {
+          // Remove the event listener when the component unmounts
+          BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+        };
+      }, []),
+    );
 
   useEffect(() => {
     fetchLeaderboardData();
