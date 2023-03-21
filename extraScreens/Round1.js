@@ -22,7 +22,7 @@ export default function Round1() {
         // Add your custom back button handling logic here
         // Return 'true' if you want to prevent the default back button behavior
         removeScoreRecord();
-        navigation.replace("Home");
+        navigation.navigate("Home");
         return true;
       };
   

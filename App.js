@@ -16,6 +16,7 @@ import Game_3 from "./screens/Game_3";
 import Game_4 from "./screens/Game_4";
 import Game_5 from "./screens/Game_5";
 import NormalResult from "./screens/NormalResult";
+import NormalLeaderboard from "./screens/NormalLeaderboard";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,9 @@ export default function App() {
         <Stack.Screen name='Game_4' component={Game_4}/>
         <Stack.Screen name='Game_5' component={Game_5}/>
         <Stack.Screen name='NormalResult' component={NormalResult}/>
+        <Stack.Screen name='NormalLeaderboard' component={NormalLeaderboard}/>
+
+
 
         <Stack.Screen name='Round1' component={Round1}/>
         <Stack.Screen name='Round2' component={Round2}/>

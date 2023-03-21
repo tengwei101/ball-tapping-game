@@ -20,7 +20,7 @@ const Home = ({ navigation }) => {
 
   const onLeaderboardPress = () => {
     // Navigate to the Leaderboard screen
-    navigation.navigate('Leaderboard');
+    navigation.navigate('NormalLeaderboard');
   };
 
   return (

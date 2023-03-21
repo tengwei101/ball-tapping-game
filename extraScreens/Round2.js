@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/core'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native';
+import { playSound } from './Round1';
 
 
 const Round2 = () => {
@@ -20,7 +21,7 @@ const Round2 = () => {
           // Add your custom back button handling logic here
           // Return 'true' if you want to prevent the default back button behavior
           removeScoreRecord();
-          navigation.replace("Home");
+          navigation.navigate("Home");
           return true;
         };
     
@@ -72,9 +73,6 @@ const Round2 = () => {
         };
       }, [timeLeft, isStart]),
     );
-    
-  
-  
   
     const clickButton = () => {
       setCount(count_2 + 1);

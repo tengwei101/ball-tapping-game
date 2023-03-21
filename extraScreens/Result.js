@@ -104,7 +104,10 @@ const Result = () => {
   const checkTop25 = async () => {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
-      const data = await AsyncStorage.multiGet(allKeys);
+      const mySuperStoreKeys = allKeys.filter((key) =>
+        key.startsWith('@MySuperStore')
+      );
+      const data = await AsyncStorage.multiGet(mySuperStoreKeys);
       const parsedData = data.map(([key, value]) => ({
         name: JSON.parse(value).name,
         total_score: JSON.parse(value).total_score,
@@ -127,6 +130,7 @@ const Result = () => {
     }
   };
   
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -134,7 +138,7 @@ const Result = () => {
         // Add your custom back button handling logic here
         // Return 'true' if you want to prevent the default back button behavior
         removeScoreRecord();
-        navigation.replace("Home");
+        navigation.navigate("Home");
         return true;
       };
   

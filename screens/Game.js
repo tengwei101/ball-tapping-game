@@ -4,6 +4,7 @@ import Circle from '../components/Circle';
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { Audio } from 'expo-av';
 
 export const saveScore = async (score) => {
   try {
@@ -47,7 +48,7 @@ const Game = () => {
         // Add your custom back button handling logic here
         // Return 'true' if you want to prevent the default back button behavior
         removeScore();
-        navigation.replace("Home");
+        navigation.navigate("Home");
         return true;
       };
   
@@ -100,7 +101,7 @@ const Game = () => {
           onPress: () => {
             setIsLevelCompleted(false);
             removeScore();
-            resetGame();
+            navigation.navigate("Home");
           },
           style: 'cancel',
         },
@@ -154,7 +155,7 @@ const Game = () => {
     newClickedCircles[index] = true;
     setClickedCircles(newClickedCircles);
 
-    setScore((prevScore) => prevScore + 1);
+    setScore((prevScore) => prevScore + 1);    
 
     if (newCircles.every((circle) => circle)) {
       setGameStarted(false);
@@ -183,7 +184,7 @@ const Game = () => {
           />
         ))}
       </View>
-      <Text>Score: {score}</Text>
+      <Text style={{fontSize: 20, marginTop: 10}}>Score: {score}</Text>
       {gameStarted ? (
         <Text>Time remaining: {timer} seconds</Text>
       ) : (

@@ -3,7 +3,7 @@ import { View, Button, Text, StyleSheet, Alert,BackHandler } from 'react-native'
 import Circle from '../components/Circle_2';
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { saveScore, removeScore } from './Game';
+import { saveScore, removeScore, playSound } from './Game';
 import { useFocusEffect } from '@react-navigation/native';
 
 const Game_2 = () => {
@@ -23,7 +23,7 @@ const Game_2 = () => {
         // Add your custom back button handling logic here
         // Return 'true' if you want to prevent the default back button behavior
         removeScore();
-        navigation.replace("Home");
+        navigation.navigate("Home");
         return true;
       };
   
@@ -61,7 +61,7 @@ const Game_2 = () => {
           onPress: () => {
             setIsLevelCompleted(false);
             removeScore();
-            resetGame();
+            navigation.navigate("Home");
           },
           style: 'cancel',
         },
@@ -145,7 +145,7 @@ const Game_2 = () => {
           />
         ))}
       </View>
-      <Text>Score: {score}</Text>
+      <Text style={{fontSize: 20, marginTop: 10}}>Score: {score}</Text>
       {gameStarted ? (
         <Text>Time remaining: {timer} seconds</Text>
       ) : (

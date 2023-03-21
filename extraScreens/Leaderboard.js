@@ -62,20 +62,24 @@ const Leaderboard = () => {
         // insertSampleData();
 
         const getData = async () => {
-        try {
+          try {
             const allKeys = await AsyncStorage.getAllKeys();
-            const data = await AsyncStorage.multiGet(allKeys);
+            const mySuperStoreKeys = allKeys.filter((key) =>
+              key.startsWith('@MySuperStore')
+            );
+            const data = await AsyncStorage.multiGet(mySuperStoreKeys);
             const parsedData = data.map(([key, value]) => ({
-                name: JSON.parse(value).name,
-                total_score: JSON.parse(value).total_score,
+              name: JSON.parse(value).name,
+              total_score: JSON.parse(value).total_score,
             }));
-
-        const sortedData = parsedData.sort((a, b) => b.total_score - a.total_score);
-        setData(sortedData); // set state with the sorted data
-        } catch (error) {
+        
+            const sortedData = parsedData.sort((a, b) => b.total_score - a.total_score);
+            setData(sortedData); // set state with the sorted data
+          } catch (error) {
             console.log(error);
-        }
+          }
         };
+        
         getData();
     }, [refreshCount]);
     
@@ -98,17 +102,24 @@ const Leaderboard = () => {
     Alert.alert('Clear Records', 'Do you want to clear all of the records?', [
       {
         text: 'Yes',
-        onPress: () => {
-          AsyncStorage.clear()
-          .then(() => {
-            console.log('AsyncStorage cleared!')
-            Alert.alert('Success', 'All the records has been cleared!')
+        onPress: async () => {
+          try {
+            const allKeys = await AsyncStorage.getAllKeys();
+            const mySuperStoreKeys = allKeys.filter((key) =>
+              key.startsWith('@MySuperStore')
+            );
+  
+            await Promise.all(
+              mySuperStoreKeys.map((key) => AsyncStorage.removeItem(key))
+            );
+  
+            console.log('AsyncStorage cleared!');
+            Alert.alert('Success', 'All the records have been cleared!');
             setRefreshCount(refreshCount + 1);
-          })
-          .catch((error) => {
-            console.log(error)
-            Alert.alert('Error', error)
-          }); 
+          } catch (error) {
+            console.log(error);
+            Alert.alert('Error', error);
+          }
         },
       },
       {
@@ -116,7 +127,8 @@ const Leaderboard = () => {
         style: 'cancel',
       },
     ]);
-  }
+  };
+  
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-black">

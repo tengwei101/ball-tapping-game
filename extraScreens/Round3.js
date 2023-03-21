@@ -5,6 +5,7 @@ import React, {useState, useEffect} from "react"
 import {useNavigation} from '@react-navigation/core'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native';
+import { playSound } from './Round1';
 
 
 
@@ -22,7 +23,7 @@ const Round3 = () => {
         // Add your custom back button handling logic here
         // Return 'true' if you want to prevent the default back button behavior
         removeScoreRecord();
-        navigation.replace("Home");
+        navigation.navigate("Home");
         return true;
       };
   
