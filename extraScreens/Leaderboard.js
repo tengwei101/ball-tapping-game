@@ -46,7 +46,7 @@ const Leaderboard = () => {
   
     for (let i = 0; i < names.length; i++) {
       const name = names[i];
-      const total_score = Math.floor(Math.random() * (56 - 35)) + 35; // Generate a random score between 35 and 55
+      const total_score = Math.floor(Math.random() * (40 - 20)) + 20; // Generate a random score between 35 and 55
       const userData = {
         name,
         total_score,
@@ -128,6 +128,10 @@ const Leaderboard = () => {
       },
     ]);
   };
+
+  const handleNormalLeaderboard = () =>{
+    navigation.navigate("NormalLeaderboard")
+  }
   
 
   return (
@@ -158,6 +162,9 @@ const Leaderboard = () => {
 
     <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleClear}>
         <Text className="text-[16px]">Clear</Text>
+    </TouchableOpacity>
+    <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleNormalLeaderboard}>
+        <Text className="text-[16px]">Normal</Text>
     </TouchableOpacity>
     </View>
 

@@ -150,14 +150,18 @@ export default function Round1() {
       <View>
         {
           isStart === true ?
-          <Text className="text-white text-[30px]">Timer: {timeLeft}</Text>
+          <Text className="text-white text-[30px] mb-2">Timer: {timeLeft}</Text>
           :
           <View></View>
         }
-        <TouchableOpacity className="rounded-lg w-28 h-16 bg-white items-center justify-center mt-3 mb-2" onPress={handleStart}>
+        {
+          isStart === true ?
+          <View/>
+          :
+          <TouchableOpacity className="rounded-lg w-28 h-16 bg-white items-center justify-center mt-3 mb-2" onPress={handleStart}>
           <Text className="text-[20px]">Start</Text>
-        </TouchableOpacity>
-
+          </TouchableOpacity>
+        }
       </View>
     </SafeAreaView>
   );

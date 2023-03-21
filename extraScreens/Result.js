@@ -92,13 +92,6 @@ const Result = () => {
 
     removeScoreRecord();
     
-    await AsyncStorage.getAllKeys()
-      .then((keys) => {
-        console.log('All keys retrieved successfully:', keys);
-      })
-      .catch((error) => {
-        console.log('Error retrieving keys:', error);
-      });
   }
 
   const checkTop25 = async () => {
@@ -162,13 +155,6 @@ const Result = () => {
       checkTop25();
     }
   }, [total_score]);
-  
-
-  const handleLeaderboard = async() => {
-    removeScoreRecord();
-    navigation.replace("Leaderboard")
-  }
-
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-black">
@@ -201,10 +187,6 @@ const Result = () => {
                 <Text className="text-[16px]">Save Record</Text>
               </TouchableOpacity>
             )}
-
-          <TouchableOpacity className="bg-cyan-400 rounded-lg h-12 items-center justify-center w-28" onPress={handleLeaderboard}>
-                <Text className="text-[16px]">Leaderboard</Text>
-          </TouchableOpacity>
         </View>
 
         
